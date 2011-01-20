@@ -20,7 +20,7 @@
       '((background-mode . dark)))
 
 (modify-frame-parameters (selected-frame) default-frame-alist)
-(frame-update-face-colors (selected-frame))
+;(frame-update-face-colors (selected-frame))
 (custom-set-faces
  '(modeline ((t (:foreground "white" :background "slate grey")))))
 
@@ -28,6 +28,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Global environment ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; Add mac ports to path
+(setenv "PATH"
+        (concat
+         "/opt/local/bin" ":"
+         "/opt/local/sbin" ":"
+         (getenv "PATH")))
+
+;;; Hook up mac's command key to meta
+(setq mac-option-key-is-meta nil)
+(setq mac-command-key-is-meta t)
+(setq mac-command-modifier 'meta)
+(setq mac-option-modifier nil)
 
 ;;; Syntax highlighting
 (global-font-lock-mode 1)
@@ -286,12 +299,6 @@
         python-indent 4))
 
 (add-hook 'python-mode-hook 'my-pystuff)
-
-;;; I'm torn on whether I like ipython or not. I currently do not.
-;(setq ipython-command "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin/ipython")
-;(setq py-python-command-args '( "-colors" "Linux"))
-;(require 'ipython)
-;(require 'anything-ipython)
 
 
 ;;;;;;;;;;;;
