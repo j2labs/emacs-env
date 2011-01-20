@@ -1,0 +1,344 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Changes in appearance ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;(set-default-font "-*-Andale Mono-*-*-*-*-13-*-*-*-*-*-*-*")
+(set-default-font "-*-Inconsolata-*-*-*-*-13-*-*-*-*-*-*-*")
+;(set-default-font "-*-Mensch-*-*-*-*-12-*-*-*-*-*-*-*")
+
+;;(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+;;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(set-scroll-bar-mode 'right)
+
+(setq default-frame-alist
+      `((cursor-color . "blue")
+        (background-color . "#202020")
+        (foreground-color . "#ffffff")))
+
+(setq initial-frame-alist 
+      '((background-mode . dark)))
+
+(modify-frame-parameters (selected-frame) default-frame-alist)
+(frame-update-face-colors (selected-frame))
+(custom-set-faces
+ '(modeline ((t (:foreground "white" :background "slate grey")))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; Global environment ;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; Syntax highlighting
+(global-font-lock-mode 1)
+
+;;; Some useful display options
+(setq inhibit-startup-message t)
+;;(setq display-time-day-and-date t)
+(display-time)
+
+;;; Keep the files clean by default
+(setq default-major-mode 'text-mode)
+(setq require-final-newline t)
+
+;;; enable coloring for parenthesis matching
+(show-paren-mode) 
+
+;;; show regions with different color
+(setq transient-mark-mode t)
+
+;;; show line numbers
+(setq line-number-mode 1)
+
+;;; set the line number display limit to some large value
+(setq line-number-display-limit 1000000)
+
+;;; show column numbers
+(setq column-number-mode t)
+
+;;; set the column at which to wrap
+(setq fill-column 72)
+
+;;; visual bell
+(setq visible-bell t)
+
+;;; Set the debug option to enable a backtrace when a
+;;; problem occurs.
+;;(setq debug-on-error t)
+
+;;; Use spaces instead of tab
+(setq indent-tabs-mode nil)
+(setq-default indent-tabs-mode nil)
+
+;;; Set the tab width
+(setq default-tab-width 4)
+(setq tab-width 4)
+(setq c-basic-indent 4)
+
+;;; Set up line at a time scrolling
+(setq scroll-conservatively 10000)
+(setq scroll-step 0)
+
+;;; Easier to remember window manipulating keys
+(global-set-key [f1] 'shrink-window-horizontally)
+(global-set-key [f2] 'shrink-window)
+(global-set-key [f3] 'enlarge-window)
+(global-set-key [f4] 'enlarge-window-horizontally)
+
+;;; Replacements used often
+(global-set-key [f5] 'replace-string)
+(global-set-key [f6] 'replace-regexp)
+(global-set-key [f7] 'rename-buffer)
+(global-set-key "\C-n" 'new-frame)
+
+;;; Setup Emacs to run bash as its primary shell.
+(setq shell-file-name "bash")
+(setq shell-command-switch "-ic")
+(setq explicit-shell-file-name shell-file-name)
+(setenv "SHELL" shell-file-name)
+(setq explicit-sh-args '("--login" "-i"))
+
+;;; Case insensitive buffer search
+(setq case-fold-search t)
+
+;;; General key mappings
+(global-set-key "\M-g" 'goto-line) 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; generally useful functions ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun tab-hook ()
+  (local-set-key [(control m)] 'newline-and-indent)
+  (setq indent-tabs-mode nil))  
+
+
+;;;;;;;;;;;;;;;;
+;; load paths ;;
+;;;;;;;;;;;;;;;;
+(add-to-list 'load-path "~/.emacs.d/site-lisp/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/python-mode")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/tuareg-mode")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/slime")
+(add-to-list 'load-path "/opt/local/lib/erlang/lib/tools-2.6.6.2/emacs")
+
+
+;;;;;;;;;;;
+;; tramp ;;
+;;;;;;;;;;;
+(setq tramp-default-method "ssh")
+
+
+;;;;;;;;;;;;
+;; eshell ;;
+;;;;;;;;;;;;
+
+;;; Change the default eshell prompt
+(setq eshell-prompt-function
+      (lambda ()
+        (concat (getenv "USER") "@" (getenv "HOSTNAME") " : "
+                (format-time-string "%l:%M %p") " : "
+                "\033[01;34m" (eshell/pwd) "\033[00m\n$ ")))
+(setq eshell-prompt-regexp "^[^#$\n]*[#$] ")
+
+;;; ctrl-a goes to beginning of command line and not buffer line
+(defun eshell-maybe-bol ()
+  (interactive)
+  (let ((p (point)))
+    (eshell-bol)
+    (if (= p (point))
+        (beginning-of-line))))
+(add-hook 'eshell-mode-hook
+          '(lambda () (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
+
+;;; confirm before overwriting files
+(setq eshell-cp-interactive-query t
+      eshell-ln-interactive-query t
+      eshell-mv-interactive-query t
+      eshell-rm-interactive-query t
+      eshell-mv-overwrite-files nil)
+
+;;; handle color codes and other things
+;;(autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
+(require 'ansi-color)
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+(add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
+(add-hook 'eshell-preoutput-filter-functions 'ansi-color-apply)
+
+;;; clear command
+(defun eshell/clear ()
+  "Clears the shell buffer ala Unix's clear or DOS' cls"
+  (interactive)
+  ;; the shell prompts are read-only, so clear that for the duration
+  (let ((inhibit-read-only t))
+    ;; simply delete the region
+    (delete-region (point-min) (point-max))))
+
+
+;;;;;;;;;
+;; erc ;;
+;;;;;;;;;
+
+;;; http://www.emacswiki.org/emacs/ErcHighlightNicknames
+(and
+ (require 'erc-highlight-nicknames)
+ (add-to-list 'erc-modules 'highlight-nicknames)
+ (erc-update-modules))
+
+;;; map ctrl-a to beginning of line
+(add-hook 'erc-mode-hook
+          '(lambda ()
+             (define-key erc-mode-map "\C-a"
+               '(lambda ()
+                  (interactive)
+                  (let ((p (point)))
+                    (erc-bol)
+                    (if (= p (point)) (beginning-of-line)))))))
+
+;;; channel specific prompts (like #emacs)
+;;; seems to need input before working...
+(setq erc-prompt (lambda ()
+                   (if (and (boundp 'erc-default-recipients) (erc-default-target))
+                       (erc-propertize (concat (erc-default-target) ">")
+                                       'read-only t
+                                       'rear-nonsticky t
+                                       'front-nonsticky t)
+                     (erc-propertize (concat "ERC>") 
+                                     'read-only t 
+                                     'rear-nonsticky t 
+                                     'front-nonsticky t))))
+
+;;; align nicks and messages along a center
+(setq erc-fill-function 'erc-fill-static)
+(setq erc-fill-static-center 20)
+
+;;; set the fill width to the window. defaults to 78
+(setq erc-fill-column (- (window-width) 2))
+(add-hook 'window-configuration-change-hook
+          '(lambda ()
+             (setq erc-fill-column (- (window-width) 2))))
+
+;;; change head line face if disconnected
+(defface erc-header-line-disconnected
+  '((t (:foreground "black" :background "indianred")))
+  "Face to use when ERC has been disconnected.")
+
+(defun erc-update-header-line-show-disconnected ()
+  "Use a different face in the header-line when disconnected."
+  (erc-with-server-buffer
+    (cond ((erc-server-process-alive) nil)
+          (t 'erc-header-line-disconnected))))
+
+(setq erc-header-line-face-method 'erc-update-header-line-show-disconnected)
+
+;;; kill buffer on /part (aka /leave)
+(setq erc-kill-buffer-on-part t)
+
+;;; open a new frame
+(global-set-key "\M-n" 'new-frame)
+
+
+;;;;;;;;;;;
+;; setnu ;;
+;;;;;;;;;;;
+(require 'setnu)
+(require 'setnu+)
+(global-set-key "\C-cl" 'setnu-mode)
+
+
+;;;;;;;;;;;;;;;;;;;;;
+;; javascript-mode ;;
+;;;;;;;;;;;;;;;;;;;;;
+(require 'javascript-mode)
+(add-to-list 'auto-mode-alist '("\\.js$" . javascript-mode))
+(autoload 'javascript-mode "javascript-mode" "Load javascript-mode")
+
+
+;;;;;;;;;;;;;;;;;
+;; better diff ;;
+;;;;;;;;;;;;;;;;;
+(require 'diff-mode-)
+(autoload 'diff-mode "diff-mode" "Load diff-mode")
+(add-to-list 'auto-mode-alist '("\\.diff$" . diff-mode))
+
+
+;;;;;;;;;;;;;;;;;
+;; python-mode ;;
+;;;;;;;;;;;;;;;;;
+(setq interpreter-mode-alist
+      (cons '("python" . python-mode)
+            interpreter-mode-alist)
+      python-mode-hook
+      '(lambda () (progn
+                    (set-variable 'py-indent-offset 4)
+                    (set-variable 'py-smart-indentation nil)
+                    (set-variable 'indent-tabs-mode nil) )))
+
+(autoload 'python-mode "python-mode" "Python editing mode." t)
+(add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
+
+;;; Force good formatting from Emacs for python
+(defun my-pystuff ()
+  (setq tab-width 4
+        py-indent-offset 4
+        indent-tabs-mode t
+        py-smart-indentation nil
+        python-indent 4))
+
+(add-hook 'python-mode-hook 'my-pystuff)
+
+;;; I'm torn on whether I like ipython or not. I currently do not.
+;(setq ipython-command "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin/ipython")
+;(setq py-python-command-args '( "-colors" "Linux"))
+;(require 'ipython)
+;(require 'anything-ipython)
+
+
+;;;;;;;;;;;;
+;; erlang ;;
+;;;;;;;;;;;;
+(setq erlang-root-dir "/opt/local/lib/erlang/")
+(setq exec-path (cons "/opt/local/lib/erlang/bin/" exec-path))
+(require 'erlang-start)
+
+
+;;;;;;;;;;;;;;;;;;
+;; Lisp / Slime ;;
+;;;;;;;;;;;;;;;;;;
+(require 'slime)
+(setq inferior-lisp-program "sbcl")
+(slime-setup)
+
+(add-hook 'lisp-mode-hook
+          (lambda ()
+            (local-set-key [(control m)] 'newline-and-indent) (slime-mode t)))
+
+(add-hook 'inferior-lisp-mode-hook
+          (lambda ()
+            (inferior-slime-mode t)))
+
+
+;;;;;;;;;;;
+;; OCaml ;;
+;;;;;;;;;;;
+(setq auto-mode-alist (cons '("\\.ml\\w?" . tuareg-mode) auto-mode-alist))
+(autoload 'tuareg-mode "tuareg" "Major mode for editing Caml code" t)
+(autoload 'camldebug "camldebug" "Run the Caml debugger" t)
+
+
+;;;;;;;;;;;
+;; LaTeX ::
+;;;;;;;;;;;
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+
+;;; setnu for the different modes I use often
+;(add-hook 'java-mode-hook 'setnu-mode)
+;(add-hook 'python-mode-hook 'setnu-mode)
+;(add-hook 'erlang-mode-hook 'setnu-mode)
+;(add-hook 'caml-mode-hook 'setnu-mode)
+
+;;; tab hooks for auto-indention
+(add-hook 'java-mode-hook 'tab-hook)
+(add-hook 'python-mode-hook 'tab-hook)
+(add-hook 'erlang-mode-hook 'tab-hook)
+(add-hook 'tuareg-mode-hook 'tab-hook)
