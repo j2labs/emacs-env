@@ -4,15 +4,15 @@
 ;; Description: Extensions to `setnu.el'.
 ;; Author: Drew Adams
 ;; Maintainer: Drew Adams
-;; Copyright (C) 2000-2006, Drew Adams, all rights reserved.
+;; Copyright (C) 2000-2011, Drew Adams, all rights reserved.
 ;; Created: Thu Nov 30 08:51:07 2000
 ;; Version: 21.0
-;; Last-Updated: Mon Oct 02 07:30:16 2006 (-25200 Pacific Daylight Time)
+;; Last-Updated: Tue Jan  4 13:55:13 2011 (-0800)
 ;;           By: dradams
-;;     Update #: 153
+;;     Update #: 168
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/setnu+.el
 ;; Keywords: lines
-;; Compatibility: GNU Emacs 20.x, GNU Emacs 21.x, GNU Emacs 22.x
+;; Compatibility: GNU Emacs: 20.x, 21.x, 22.x, 23.x
 ;;
 ;; Features that might be required by this library:
 ;;
@@ -36,8 +36,12 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;; Change log:
+;;; Change Log:
 ;;
+;; 2011/01/04 dadams
+;;     Added autoload cookies for defgroup and defcustom.
+;; 2010/12/04 dadams
+;;     Removed make-local-hook calls (no longer exists in Emacs 24).
 ;; 2006/10/02 dadams
 ;;     Added soft require of fit-frame.el.  Thx to Andreas Roehler.
 ;; 2005/12/26 dadams
@@ -69,7 +73,6 @@
 ;;
 ;;; Code:
 
-(and (< emacs-major-version 20) (eval-when-compile (require 'cl))) ;; when, unless
 (require 'setnu)
 
 (require 'frame-cmds nil t) ;; enlarge-frame-horizontally
@@ -77,19 +80,22 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(remove-hook 'before-change-functions 'setnu-before-change-function)
-(remove-hook 'after-change-functions 'setnu-after-change-function)
-(make-local-hook 'before-change-functions)
-(make-local-hook 'after-change-functions)
+;;; (remove-hook 'before-change-functions 'setnu-before-change-function)
+;;; (remove-hook 'after-change-functions 'setnu-after-change-function)
+;;; (make-local-hook 'before-change-functions)
+;;; (make-local-hook 'after-change-functions)
 
+;;;###autoload
 (defgroup Setnu-Plus nil "Setnu options." :group 'convenience)
 
+;;;###autoload
 (defcustom setnu+-newline-deletion-flag t
   "*Non-nil means check for newline deletions when numbering lines
 via `setnu'."
   :type 'boolean :group 'Setnu-Plus)
 (make-variable-buffer-local 'setnu+-newline-deletion-flag)
 
+;;;###autoload
 (defcustom setnu+-fit-frame-flag t
   "*Non-nil means `setnu-mode' fits frame to buffer, if `one-window-p'.
 This has no effect if function `fit-frame' is not defined."
