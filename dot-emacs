@@ -131,8 +131,10 @@
 ;;;;;;;;;;;;;;;;
 (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/python-mode")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/tuareg-mode")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/tuareg")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/slime")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/coffee-mode")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/markdown-mode")
 (add-to-list 'load-path "/opt/local/lib/erlang/lib/tools-2.6.6.2/emacs")
 
 
@@ -332,6 +334,29 @@
 (autoload 'tuareg-mode "tuareg" "Major mode for editing Caml code" t)
 (autoload 'camldebug "camldebug" "Run the Caml debugger" t)
 
+
+;;;;;;;;;;;;;;;;
+;;; Markdown ;;;
+;;;;;;;;;;;;;;;;
+(autoload 'markdown-mode "markdown-mode.el"
+   "Major mode for editing Markdown files" t)
+(setq auto-mode-alist
+   (cons '("\\.md" . markdown-mode) auto-mode-alist))
+
+
+;;;;;;;;;;;;;;;;;;;;
+;;; CoffeeScript ;;;
+;;;;;;;;;;;;;;;;;;;;
+(require 'coffee-mode)
+(add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
+(add-to-list 'auto-mode-alist '("Cakefile" . coffee-mode))
+
+(defun coffee-custom ()
+  "coffee-mode-hook"
+  (set (make-local-variable 'tab-width) 2))
+
+(add-hook 'coffee-mode-hook
+          '(lambda() (coffee-custom)))
 
 ;;;;;;;;;;;
 ;; LaTeX ::
