@@ -2,8 +2,8 @@
 ;; Changes in appearance ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;(set-default-font "-*-Andale Mono-*-*-*-*-13-*-*-*-*-*-*-*")
-(set-default-font "-*-Inconsolata-*-*-*-*-13-*-*-*-*-*-*-*")
+(set-default-font "-*-Andale Mono-*-*-*-*-13-*-*-*-*-*-*-*")
+;(set-default-font "-*-Inconsolata-*-*-*-*-13-*-*-*-*-*-*-*")
 ;(set-default-font "-*-Mensch-*-*-*-*-12-*-*-*-*-*-*-*")
 
 ;;(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
@@ -12,8 +12,8 @@
 (set-scroll-bar-mode 'right)
 
 (setq default-frame-alist
-      `((cursor-color . "blue")
-        (background-color . "#202020")
+      `((cursor-color . "#000099")
+        (background-color . "#151515")
         (foreground-color . "#ffffff")))
 
 (setq initial-frame-alist 
@@ -32,8 +32,8 @@
 ;;; Add mac ports to path
 (setenv "PATH"
         (concat
-         "/opt/local/bin" ":"
-         "/opt/local/sbin" ":"
+         "/usr/local/bin" ":"
+         "/usr/local/sbin" ":"
          (getenv "PATH")))
 
 ;;; Hook up mac's command key to meta
@@ -135,7 +135,7 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/slime")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/coffee-mode")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/markdown-mode")
-(add-to-list 'load-path "/opt/local/lib/erlang/lib/tools-2.6.6.2/emacs")
+(add-to-list 'load-path "/usr/local/lib/erlang/lib/tools-2.6.6.4/emacs")
 
 
 ;;;;;;;;;;;
@@ -306,8 +306,8 @@
 ;;;;;;;;;;;;
 ;; erlang ;;
 ;;;;;;;;;;;;
-(setq erlang-root-dir "/opt/local/lib/erlang/")
-(setq exec-path (cons "/opt/local/lib/erlang/bin/" exec-path))
+(setq erlang-root-dir "/usr/local/lib/erlang/")
+(setq exec-path (cons "/usr/local/lib/erlang/bin/" exec-path))
 (require 'erlang-start)
 
 
