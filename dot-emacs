@@ -2,8 +2,8 @@
 ;; Changes in appearance ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(set-default-font "-*-Andale Mono-*-*-*-*-13-*-*-*-*-*-*-*")
-;(set-default-font "-*-Inconsolata-*-*-*-*-13-*-*-*-*-*-*-*")
+;(set-default-font "-*-Andale Mono-*-*-*-*-13-*-*-*-*-*-*-*")
+(set-default-font "-*-Inconsolata-*-*-*-*-14-*-*-*-*-*-*-*")
 ;(set-default-font "-*-Mensch-*-*-*-*-12-*-*-*-*-*-*-*")
 
 ;;(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
@@ -12,7 +12,7 @@
 (set-scroll-bar-mode 'right)
 
 (setq default-frame-alist
-      `((cursor-color . "#000099")
+      `((cursor-color . "#009900")
         (background-color . "#151515")
         (foreground-color . "#ffffff")))
 
@@ -44,6 +44,11 @@
 
 ;;; Syntax highlighting
 (global-font-lock-mode 1)
+
+;;; Highlight current line
+(require 'highlight-current-line)
+(highlight-current-line-on t)
+ (set-face-background 'highlight-current-line-face "grey15")
 
 ;;; Some useful display options
 (setq inhibit-startup-message t)
@@ -135,7 +140,7 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/slime")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/coffee-mode")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/markdown-mode")
-(add-to-list 'load-path "/usr/local/lib/erlang/lib/tools-2.6.6.4/emacs")
+(add-to-list 'load-path "/usr/local/lib/erlang/lib/tools-2.6.6.5/emacs")
 
 
 ;;;;;;;;;;;
@@ -374,3 +379,4 @@
 (add-hook 'python-mode-hook 'tab-hook)
 (add-hook 'erlang-mode-hook 'tab-hook)
 (add-hook 'tuareg-mode-hook 'tab-hook)
+(put 'upcase-region 'disabled nil)
