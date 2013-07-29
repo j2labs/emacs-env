@@ -45,11 +45,6 @@
 ;;; Syntax highlighting
 (global-font-lock-mode 1)
 
-;;; Highlight current line
-(require 'highlight-current-line)
-(highlight-current-line-on t)
- (set-face-background 'highlight-current-line-face "grey15")
-
 ;;; Some useful display options
 (setq inhibit-startup-message t)
 ;;(setq display-time-day-and-date t)
@@ -122,6 +117,9 @@
 ;;; General key mappings
 (global-set-key "\M-g" 'goto-line) 
 
+;;; open a new frame
+(global-set-key "\M-n" 'new-frame)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; generally useful functions ;;
@@ -136,126 +134,17 @@
 ;;;;;;;;;;;;;;;;
 (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/python-mode")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/tuareg")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/slime")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/coffee-mode")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/ocaml-mode")
+;(add-to-list 'load-path "~/.emacs.d/site-lisp/slime")
+;(add-to-list 'load-path "~/.emacs.d/site-lisp/coffee-mode")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/markdown-mode")
-(add-to-list 'load-path "/usr/local/lib/erlang/lib/tools-2.6.6.5/emacs")
+(add-to-list 'load-path "/usr/local/lib/erlang/lib/tools-2.6.8/emacs")
 
 
 ;;;;;;;;;;;
 ;; tramp ;;
 ;;;;;;;;;;;
 (setq tramp-default-method "ssh")
-
-
-;;;;;;;;;;;;
-;; eshell ;;
-;;;;;;;;;;;;
-
-;;; Change the default eshell prompt
-(setq eshell-prompt-function
-      (lambda ()
-        (concat (getenv "USER") "@" (getenv "HOSTNAME") " : "
-                (format-time-string "%l:%M %p") " : "
-                "\033[01;34m" (eshell/pwd) "\033[00m\n$ ")))
-(setq eshell-prompt-regexp "^[^#$\n]*[#$] ")
-
-;;; ctrl-a goes to beginning of command line and not buffer line
-(defun eshell-maybe-bol ()
-  (interactive)
-  (let ((p (point)))
-    (eshell-bol)
-    (if (= p (point))
-        (beginning-of-line))))
-(add-hook 'eshell-mode-hook
-          '(lambda () (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
-
-;;; confirm before overwriting files
-(setq eshell-cp-interactive-query t
-      eshell-ln-interactive-query t
-      eshell-mv-interactive-query t
-      eshell-rm-interactive-query t
-      eshell-mv-overwrite-files nil)
-
-;;; handle color codes and other things
-;;(autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
-(require 'ansi-color)
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-(add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
-(add-hook 'eshell-preoutput-filter-functions 'ansi-color-apply)
-
-;;; clear command
-(defun eshell/clear ()
-  "Clears the shell buffer ala Unix's clear or DOS' cls"
-  (interactive)
-  ;; the shell prompts are read-only, so clear that for the duration
-  (let ((inhibit-read-only t))
-    ;; simply delete the region
-    (delete-region (point-min) (point-max))))
-
-
-;;;;;;;;;
-;; erc ;;
-;;;;;;;;;
-
-;;; http://www.emacswiki.org/emacs/ErcHighlightNicknames
-(and
- (require 'erc-highlight-nicknames)
- (add-to-list 'erc-modules 'highlight-nicknames)
- (erc-update-modules))
-
-;;; map ctrl-a to beginning of line
-(add-hook 'erc-mode-hook
-          '(lambda ()
-             (define-key erc-mode-map "\C-a"
-               '(lambda ()
-                  (interactive)
-                  (let ((p (point)))
-                    (erc-bol)
-                    (if (= p (point)) (beginning-of-line)))))))
-
-;;; channel specific prompts (like #emacs)
-;;; seems to need input before working...
-(setq erc-prompt (lambda ()
-                   (if (and (boundp 'erc-default-recipients) (erc-default-target))
-                       (erc-propertize (concat (erc-default-target) ">")
-                                       'read-only t
-                                       'rear-nonsticky t
-                                       'front-nonsticky t)
-                     (erc-propertize (concat "ERC>") 
-                                     'read-only t 
-                                     'rear-nonsticky t 
-                                     'front-nonsticky t))))
-
-;;; align nicks and messages along a center
-(setq erc-fill-function 'erc-fill-static)
-(setq erc-fill-static-center 20)
-
-;;; set the fill width to the window. defaults to 78
-(setq erc-fill-column (- (window-width) 2))
-(add-hook 'window-configuration-change-hook
-          '(lambda ()
-             (setq erc-fill-column (- (window-width) 2))))
-
-;;; change head line face if disconnected
-(defface erc-header-line-disconnected
-  '((t (:foreground "black" :background "indianred")))
-  "Face to use when ERC has been disconnected.")
-
-(defun erc-update-header-line-show-disconnected ()
-  "Use a different face in the header-line when disconnected."
-  (erc-with-server-buffer
-    (cond ((erc-server-process-alive) nil)
-          (t 'erc-header-line-disconnected))))
-
-(setq erc-header-line-face-method 'erc-update-header-line-show-disconnected)
-
-;;; kill buffer on /part (aka /leave)
-(setq erc-kill-buffer-on-part t)
-
-;;; open a new frame
-(global-set-key "\M-n" 'new-frame)
 
 
 ;;;;;;;;;;;
@@ -316,28 +205,15 @@
 (require 'erlang-start)
 
 
-;;;;;;;;;;;;;;;;;;
-;; Lisp / Slime ;;
-;;;;;;;;;;;;;;;;;;
-(require 'slime)
-(setq inferior-lisp-program "sbcl")
-(slime-setup)
-
-(add-hook 'lisp-mode-hook
-          (lambda ()
-            (local-set-key [(control m)] 'newline-and-indent) (slime-mode t)))
-
-(add-hook 'inferior-lisp-mode-hook
-          (lambda ()
-            (inferior-slime-mode t)))
-
-
 ;;;;;;;;;;;
-;; OCaml ;;
+;; ocaml ;;
 ;;;;;;;;;;;
-(setq auto-mode-alist (cons '("\\.ml\\w?" . tuareg-mode) auto-mode-alist))
-(autoload 'tuareg-mode "tuareg" "Major mode for editing Caml code" t)
-(autoload 'camldebug "camldebug" "Run the Caml debugger" t)
+(setq auto-mode-alist
+          (cons '("\\.ml[iyl]?$" .  caml-mode) auto-mode-alist))
+
+(autoload 'caml-mode "ocaml" (interactive)
+  "Major mode for editing Caml code." t)
+(autoload 'camldebug "camldebug" (interactive) "Debug caml mode")
 
 
 ;;;;;;;;;;;;;;;;
@@ -349,34 +225,15 @@
    (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 
-;;;;;;;;;;;;;;;;;;;;
-;;; CoffeeScript ;;;
-;;;;;;;;;;;;;;;;;;;;
-(require 'coffee-mode)
-(add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
-(add-to-list 'auto-mode-alist '("Cakefile" . coffee-mode))
-
-(defun coffee-custom ()
-  "coffee-mode-hook"
-  (set (make-local-variable 'tab-width) 2))
-
-(add-hook 'coffee-mode-hook
-          '(lambda() (coffee-custom)))
-
 ;;;;;;;;;;;
 ;; LaTeX ::
 ;;;;;;;;;;;
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 
-;;; setnu for the different modes I use often
-;(add-hook 'java-mode-hook 'setnu-mode)
-;(add-hook 'python-mode-hook 'setnu-mode)
-;(add-hook 'erlang-mode-hook 'setnu-mode)
-;(add-hook 'caml-mode-hook 'setnu-mode)
 
 ;;; tab hooks for auto-indention
 (add-hook 'java-mode-hook 'tab-hook)
 (add-hook 'python-mode-hook 'tab-hook)
 (add-hook 'erlang-mode-hook 'tab-hook)
-(add-hook 'tuareg-mode-hook 'tab-hook)
-(put 'upcase-region 'disabled nil)
+;(add-hook 'tuareg-mode-hook 'tab-hook)
+
