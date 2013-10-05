@@ -230,6 +230,13 @@
 ;;;;;;;;;;;
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 
+;;;;;;;;;;;
+;; go-lang ::
+;;;;;;;;;;;
+
+;; go mode
+(setq load-path (cons "/usr/local/go/misc/emacs" load-path))
+(require 'go-mode-load)
 
 ;;; tab hooks for auto-indention
 (add-hook 'java-mode-hook 'tab-hook)
